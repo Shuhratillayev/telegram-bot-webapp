@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Imtihon Bot</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f5f5f5;
+        }
+
+        .header h1 {
+            color: #f5576c;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f5f5f5;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #f5576c;
+            border-bottom-color: #f5576c;
+        }
+
+        .tab:hover {
+            color: #f5576c;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-item input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .option-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .option-input-group input {
+            flex: 1;
+        }
+
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-add {
+            background: #28a745;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .question-list {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .question-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #f5576c;
+        }
+
+        .question-item h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .question-item p {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .question-item .options {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .question-item .correct {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .file-upload {
+            border: 2px dashed #e9ecef;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload:hover {
+            border-color: #f5576c;
+            background: #fff5f7;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-preview {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #f5576c;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #f5576c;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Admin Panel</h1>
+            <p>Imtihon botini boshqarish</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('addQuestion')">➕ Savol qo'shish</button>
+            <button class="tab" onclick="switchTab('questions')">📝 Savollar</button>
+            <button class="tab" onclick="switchTab('stats')">📊 Statistika</button>
+        </div>
+
+        <!-- Savol qo'shish -->
+        <div id="addQuestion" class="tab-content active">
+            <div id="alertBox"></div>
+
+            <form id="questionForm">
+                <div class="form-group">
+                    <label>📚 Yo'nalish</label>
+                    <select id="subject" required>
+                        <option value="">Tanlang...</option>
+                        <option value="ingliz_tili">🇬🇧 Ingliz tili</option>
+                        <option value="koreys_tili">🇰🇷 Koreys tili</option>
+                        <option value="avto_test">🚗 Avto test</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>📋 Savol turi</label>
+                    <select id="questionType" onchange="changeQuestionType()" required>
+                        <option value="">Tanlang...</option>
+                        <option value="multiple_choice">📝 Oddiy test (A,B,C,D)</option>
+                        <option value="text_input">✍️ Javob yozish</option>
+                        <option value="audio">🎧 Audio savol</option>
+                        <option value="image">🖼 Rasm savol</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>❓ Savol matni</label>
+                    <textarea id="questionText" required placeholder="Savolni kiriting..."></textarea>
+                </div>
+
+                <!-- Fayl yuklash (audio/image) -->
+                <div id="fileUploadSection" style="display:none;">
+                    <div class="form-group">
+                        <label id="fileLabel">📎 Fayl yuklash</label>
+                        <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                            <p>📎 Faylni tanlash uchun bosing</p>
+                            <input type="file" id="fileInput" accept="audio/*,image/*" onchange="previewFile()">
+                        </div>
+                        <div id="filePreview" class="file-preview" style="display:none;"></div>
+                    </div>
+                </div>
+
+                <!-- Variantlar (multiple_choice, audio, image) -->
+                <div id="optionsSection" style="display:none;">
+                    <div class="form-group">
+                        <label>📝 Javob variantlari</label>
+                        <div id="optionsContainer">
+                            <div class="option-input-group">
+                                <input type="text" placeholder="A) Variant 1" class="option-input">
+                            </div>
+                            <div class="option-input-group">
+                                <input type="text" placeholder="B) Variant 2" class="option-input">
+                            </div>
+                            <div class="option-input-group">
+                                <input type="text" placeholder="C) Variant 3" class="option-input">
+                            </div>
+                            <div class="option-input-group">
+                                <input type="text" placeholder="D) Variant 4" class="option-input">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-add" onclick="addOption()">
+                            ➕ Variant qo'shish
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>✔️ To'g'ri javob</label>
+                        <div class="radio-group" id="correctAnswerGroup">
+                            <div class="radio-item">
+                                <input type="radio" name="correctAnswer" value="0" id="correct0">
+                                <label for="correct0">A</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="correctAnswer" value="1" id="correct1">
+                                <label for="correct1">B</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="correctAnswer" value="2" id="correct2">
+                                <label for="correct2">C</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="correctAnswer" value="3" id="correct3">
+                                <label for="correct3">D</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text input javob -->
+                <div id="textAnswerSection" style="display:none;">
+                    <div class="form-group">
+                        <label>✍️ To'g'ri javob</label>
+                        <input type="text" id="correctText" placeholder="To'g'ri javobni kiriting...">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    ✅ Savolni saqlash
+                </button>
+            </form>
+        </div>
+
+        <!-- Savollar ro'yxati -->
+        <div id="questions" class="tab-content">
+            <div class="form-group">
+                <label>📚 Yo'nalishni tanlang</label>
+                <select id="filterSubject" onchange="loadQuestions()">
+                    <option value="ingliz_tili">🇬🇧 Ingliz tili</option>
+                    <option value="koreys_tili">🇰🇷 Koreys tili</option>
+                    <option value="avto_test">🚗 Avto test</option>
+                </select>
+            </div>
+
+            <div id="questionsList" class="question-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Savollar yuklanmoqda...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistika -->
+        <div id="stats" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalUsers">0</h3>
+                    <p>👥 Foydalanuvchilar</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalTests">0</h3>
+                    <p>✅ Yechilgan testlar</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalQuestions">0</h3>
+                    <p>📝 Jami savollar</p>
+                </div>
+            </div>
+
+            <div class="question-list">
+                <h3 style="margin-bottom: 15px; color: #333;">📊 Yo'nalishlar bo'yicha</h3>
+                <div class="question-item">
+                    <h4>🇬🇧 Ingliz tili</h4>
+                    <p id="englishCount">Savollar: 0</p>
+                </div>
+                <div class="question-item">
+                    <h4>🇰🇷 Koreys tili</h4>
+                    <p id="koreanCount">Savollar: 0</p>
+                </div>
+                <div class="question-item">
+                    <h4>🚗 Avto test</h4>
+                    <p id="autoCount">Savollar: 0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Demo ma'lumotlar
+        let questionsDB = {
+            ingliz_tili: [],
+            koreys_tili: [],
+            avto_test: []
+        };
+
+        let stats = {
+            users: 0,
+            tests: 0
+        };
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            if (tabName === 'questions') {
+                loadQuestions();
+            } else if (tabName === 'stats') {
+                loadStats();
+            }
+        }
+
+        // Question type change
+        function changeQuestionType() {
+            const type = document.getElementById('questionType').value;
+            const fileSection = document.getElementById('fileUploadSection');
+            const optionsSection = document.getElementById('optionsSection');
+            const textSection = document.getElementById('textAnswerSection');
+            const fileLabel = document.getElementById('fileLabel');
+            const fileInput = document.getElementById('fileInput');
+
+            // Reset
+            fileSection.style.display = 'none';
+            optionsSection.style.display = 'none';
+            textSection.style.display = 'none';
+
+            if (type === 'multiple_choice') {
+                optionsSection.style.display = 'block';
+            } else if (type === 'text_input') {
+                textSection.style.display = 'block';
+            } else if (type === 'audio') {
+                fileSection.style.display = 'block';
+                optionsSection.style.display = 'block';
+                fileLabel.textContent = '🎧 Audio fayl yuklash';
+                fileInput.accept = 'audio/*';
+            } else if (type === 'image') {
+                fileSection.style.display = 'block';
+                optionsSection.style.display = 'block';
+                fileLabel.textContent = '🖼 Rasm yuklash';
+                fileInput.accept = 'image/*';
+            }
+        }
+
+        // File preview
+        function previewFile() {
+            const file = document.getElementById('fileInput').files[0];
+            const preview = document.getElementById('filePreview');
+            
+            if (file) {
+                preview.style.display = 'block';
+                preview.textContent = `✅ Fayl tanlandi: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+            }
+        }
+
+        // Add option
+        function addOption() {
+            const container = document.getElementById('optionsContainer');
+            const count = container.children.length;
+            const letter = String.fromCharCode(65 + count);
+            
+            const div = document.createElement('div');
+            div.className = 'option-input-group';
+            div.innerHTML = `
+                <input type="text" placeholder="${letter}) Variant ${count + 1}" class="option-input">
+                <button type="button" class="btn-remove" onclick="this.parentElement.remove(); updateCorrectAnswers()">✕</button>
+            `;
+            container.appendChild(div);
+
+            // Update radio buttons
+            updateCorrectAnswers();
+        }
+
+        // Update correct answer radio buttons
+        function updateCorrectAnswers() {
+            const container = document.getElementById('optionsContainer');
+            const radioGroup = document.getElementById('correctAnswerGroup');
+            const count = container.children.length;
+
+            radioGroup.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const letter = String.fromCharCode(65 + i);
+                radioGroup.innerHTML += `
+                    <div class="radio-item">
+                        <input type="radio" name="correctAnswer" value="${i}" id="correct${i}">
+                        <label for="correct${i}">${letter}</label>
+                    </div>
+                `;
+            }
+        }
+
+        // Form submission
+        document.getElementById('questionForm').onsubmit = function(e) {
+            e.preventDefault();
+
+            const subject = document.getElementById('subject').value;
+            const type = document.getElementById('questionType').value;
+            const questionText = document.getElementById('questionText').value;
+
+            if (!subject || !type || !questionText) {
+                showAlert('Barcha maydonlarni to\'ldiring!', 'error');
+                return;
+            }
+
+            const questionData = {
+                type: type,
+                question: questionText,
+                id: Date.now()
+            };
+
+            if (type === 'multiple_choice' || type === 'audio' || type === 'image') {
+                const options = Array.from(document.querySelectorAll('.option-input'))
+                    .map(input => input.value.trim())
+                    .filter(val => val);
+
+                const correctAnswer = document.querySelector('input[name="correctAnswer"]:checked');
+
+                if (options.length < 2) {
+                    showAlert('Kamida 2 ta variant kiriting!', 'error');
+                    return;
+                }
+
+                if (!correctAnswer) {
+                    showAlert('To\'g\'ri javobni belgilang!', 'error');
+                    return;
+                }
+
+                questionData.options = options;
+                questionData.correct_answer = parseInt(correctAnswer.value);
+
+                if (type === 'audio' || type === 'image') {
+                    const file = document.getElementById('fileInput').files[0];
+                    if (!file) {
+                        showAlert('Fayl yuklang!', 'error');
+                        return;
+                    }
+                    questionData.fileName = file.name;
+                }
+            } else if (type === 'text_input') {
+                const correctText = document.getElementById('correctText').value.trim();
+                if (!correctText) {
+                    showAlert('To\'g\'ri javobni kiriting!', 'error');
+                    return;
+                }
+                questionData.correct_text = correctText;
+            }
+
+            // Save to DB
+            questionsDB[subject].push(questionData);
+            
+            // Send to Telegram bot
+            tg.sendData(JSON.stringify({
+                action: 'add_question',
+                subject: subject,
+                question: questionData
+            }));
+
+            showAlert('✅ Savol muvaffaqiyatli qo\'shildi!', 'success');
+            document.getElementById('questionForm').reset();
+            changeQuestionType();
+        };
+
+        // Show alert
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+            setTimeout(() => {
+                alertBox.innerHTML = '';
+            }, 3000);
+        }
+
+        // Load questions
+        function loadQuestions() {
+            const subject = document.getElementById('filterSubject').value;
+            const questions = questionsDB[subject] || [];
+            const container = document.getElementById('questionsList');
+
+            if (questions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <p>📝 Hali savollar qo'shilmagan</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = questions.map((q, i) => `
+                <div class="question-item">
+                    <h4>Savol ${i + 1}: ${q.question}</h4>
+                    <p><strong>Turi:</strong> ${getTypeLabel(q.type)}</p>
+                    ${q.options ? `
+                        <div class="options">
+                            ${q.options.map((opt, j) => `
+                                <p ${j === q.correct_answer ? 'class="correct"' : ''}>
+                                    ${String.fromCharCode(65 + j)}) ${opt} ${j === q.correct_answer ? '✅' : ''}
+                                </p>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    ${q.correct_text ? `<p class="correct">To'g'ri javob: ${q.correct_text} ✅</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Get type label
+        function getTypeLabel(type) {
+            const labels = {
+                multiple_choice: '📝 Oddiy test',
+                text_input: '✍️ Javob yozish',
+                audio: '🎧 Audio savol',
+                image: '🖼 Rasm savol'
+            };
+            return labels[type] || type;
+        }
+
+        // Load stats
+        function loadStats() {
+            const totalQuestions = Object.values(questionsDB).reduce((sum, arr) => sum + arr.length, 0);
+            
+            document.getElementById('totalUsers').textContent = stats.users;
+            document.getElementById('totalTests').textContent = stats.tests;
+            document.getElementById('totalQuestions').textContent = totalQuestions;
+            
+            document.getElementById('englishCount').textContent = `Savollar: ${questionsDB.ingliz_tili.length}`;
+            document.getElementById('koreanCount').textContent = `Savollar: ${questionsDB.koreys_tili.length}`;
+            document.getElementById('autoCount').textContent = `Savollar: ${questionsDB.avto_test.length}`;
+        }
+
+        // Initialize
+        tg.ready();
+    </script>
+</body>
+</html>
